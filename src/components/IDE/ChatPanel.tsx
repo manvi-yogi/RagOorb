@@ -70,13 +70,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
 
   const suggestedPrompts = [
     "Create a modern landing page for a tech startup",
-    "Build an e-commerce website with product listings",
+    "Build a restaurant website with menu and online ordering",
     "Make a portfolio website for a designer",
-    "Create a restaurant website with menu and booking",
-    "Build a blog website with multiple pages",
-    "Make a dashboard with charts and analytics",
-    "Create a social media app interface",
-    "Build a real estate website with property listings"
+    "Create a blog website with dark theme",
+    "Build a real estate website with property listings",
+    "Make a fitness app landing page",
+    "Create a SaaS product website",
+    "Build a photography portfolio site"
   ];
 
   return (

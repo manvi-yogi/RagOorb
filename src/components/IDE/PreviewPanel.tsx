@@ -5,12 +5,14 @@ interface PreviewPanelProps {
   previewUrl?: string;
   isLoading?: boolean;
   onRefresh?: () => void;
+  websiteGenerated?: boolean;
 }
 
 export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   previewUrl = 'http://localhost:5173',
   isLoading = false,
-  onRefresh
+  onRefresh,
+  websiteGenerated = false
 }) => {
   const [viewMode, setViewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [isVisible, setIsVisible] = useState(true);
@@ -132,22 +134,40 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
 
       {/* Preview Content */}
       <div className="flex-1 bg-slate-100 flex items-center justify-center p-4">
-        <div
-          className="bg-white rounded-lg shadow-lg overflow-hidden"
-          style={{
-            width: viewportSize.width,
-            height: viewportSize.height,
-            maxWidth: '100%',
-            maxHeight: '100%',
-          }}
-        >
-          <iframe
-            ref={iframeRef}
-            src={previewUrl}
-            className="w-full h-full border-none"
-            title="Preview"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-          />
+        {websiteGenerated ? (
+          <div
+            className="bg-white rounded-lg shadow-lg overflow-hidden"
+            style={{
+              width: viewportSize.width,
+              height: viewportSize.height,
+              maxWidth: '100%',
+              maxHeight: '100%',
+            }}
+          >
+            <iframe
+              ref={iframeRef}
+              src={previewUrl}
+              className="w-full h-full border-none"
+              title="Preview"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            />
+          </div>
+        ) : (
+          <div className="text-center text-slate-500 max-w-md">
+            <div className="bg-white p-8 rounded-lg shadow-lg">
+              <Eye className="h-16 w-16 mx-auto mb-4 text-slate-300" />
+              <h3 className="text-lg font-medium text-slate-900 mb-2">
+                Preview Your Website
+              </h3>
+              <p className="text-sm text-slate-600 mb-4">
+                Your generated website will appear here once you create it with AI.
+              </p>
+              <div className="text-xs text-slate-500 bg-slate-50 p-3 rounded border">
+                💡 Tip: Ask AI to create a website in the chat panel, and it will appear here instantly!
+              </div>
+            </div>
+          </div>
+        )}
         </div>
       </div>
     </div>

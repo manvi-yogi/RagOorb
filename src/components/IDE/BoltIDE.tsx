@@ -30,7 +30,20 @@ interface Message {
   }>;
 }
 
-export const BoltIDE: React.FC = () => {
+interface Document {
+  document_id: string;
+  filename: string;
+  upload_date: string;
+  file_size: number;
+  file_type: string;
+  chunks_count: number;
+}
+
+interface BoltIDEProps {
+  documents?: Document[];
+}
+
+export const BoltIDE: React.FC<BoltIDEProps> = ({ documents = [] }) => {
   const [files, setFiles] = useState<FileNode[]>([
     {
       id: '1',
@@ -47,22 +60,32 @@ export const BoltIDE: React.FC = () => {
 
 function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-8">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Welcome to Bolt IDE
+        <h1 className="text-5xl font-bold text-gray-900 mb-6">
+          Welcome to AI Website Builder
         </h1>
-        <p className="text-lg text-gray-600 mb-8">
-          Ask AI to create any website and watch it come to life!
+        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          Describe your website idea and watch AI create it instantly with modern design and functionality.
         </p>
-        <div className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto">
-          <p className="text-sm text-gray-500">
-            Try prompts like:
+        <div className="bg-white p-8 rounded-xl shadow-lg max-w-lg mx-auto">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Get Started</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Try these example prompts:
           </p>
-          <ul className="text-sm text-gray-700 mt-2 space-y-1">
-            <li>• "Create a modern landing page"</li>
-            <li>• "Build an e-commerce website"</li>
-            <li>• "Make a portfolio site"</li>
+          <ul className="text-sm text-gray-700 space-y-2 text-left">
+            <li className="flex items-center space-x-2">
+              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+              <span>"Create a modern landing page for a tech startup"</span>
+            </li>
+            <li className="flex items-center space-x-2">
+              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span>"Build a portfolio website for a designer"</span>
+            </li>
+            <li className="flex items-center space-x-2">
+              <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+              <span>"Make an e-commerce site with product listings"</span>
+            </li>
           </ul>
         </div>
       </div>
@@ -83,6 +106,7 @@ export default App;`,
   const [showTerminal, setShowTerminal] = useState(false);
   const [leftPanelCollapsed, setLeftPanelCollapsed] = useState(false);
   const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
+  const [websiteGenerated, setWebsiteGenerated] = useState(false);
 
   // Set initial selected file
   useEffect(() => {
@@ -105,30 +129,30 @@ export default App;`,
     return null;
   };
 
-  const convertApiFilesToFileNodes = (apiFiles: Array<{path: string, content: string}>): FileNode[] => {
+  const convertApiFilesToFileNodes = (filePaths: string[]): FileNode[] => {
     const fileMap = new Map<string, FileNode>();
     const rootNodes: FileNode[] = [];
 
-    // Create all file nodes first
-    apiFiles.forEach((file, index) => {
-      const parts = file.path.split('/');
+    // Create file nodes for each path
+    filePaths.forEach((filePath, index) => {
+      const parts = filePath.split('/');
       const fileName = parts[parts.length - 1];
       const fileNode: FileNode = {
         id: `file-${index}`,
         name: fileName,
         type: 'file',
-        path: file.path,
-        content: file.content,
+        path: filePath,
+        content: `// Generated file: ${filePath}\n// Content will be loaded dynamically`,
         language: fileName.split('.').pop() || 'text'
       };
-      fileMap.set(file.path, fileNode);
+      fileMap.set(filePath, fileNode);
     });
 
     // Create folder structure
     const folderMap = new Map<string, FileNode>();
     
-    apiFiles.forEach((file) => {
-      const parts = file.path.split('/');
+    filePaths.forEach((filePath) => {
+      const parts = filePath.split('/');
       let currentPath = '';
       
       for (let i = 0; i < parts.length - 1; i++) {
@@ -158,7 +182,7 @@ export default App;`,
       }
       
       // Add file to its parent folder
-      const fileNode = fileMap.get(file.path);
+      const fileNode = fileMap.get(filePath);
       if (fileNode) {
         const parentPath = parts.slice(0, -1).join('/');
         if (parentPath) {
@@ -202,8 +226,18 @@ export default App;`,
       const result = await response.json();
 
       if (result.success && result.files_written && result.files_written.length > 0) {
-        // Reload the file structure by reading the written files
-        await refreshFileStructure();
+        // Update the file structure with generated files
+        const newFiles = convertApiFilesToFileNodes(result.files_written);
+        setFiles(newFiles);
+        setWebsiteGenerated(true);
+        
+        // Select the first file if available
+        if (newFiles.length > 0) {
+          const firstFile = findFirstFile(newFiles);
+          if (firstFile) {
+            setSelectedFile(firstFile);
+          }
+        }
 
         const aiResponse: Message = {
           id: (Date.now() + 1).toString(),
@@ -233,21 +267,17 @@ export default App;`,
     }
   };
 
-  const refreshFileStructure = async () => {
-    try {
-      // In a real implementation, you might want to read the actual file system
-      // For now, we'll make a simple request to get the current state
-      const response = await fetch(`${API_BASE_URL}/health`);
-      if (response.ok) {
-        // Force a page reload to pick up new files
-        // In production, you'd implement a proper file system watcher
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+  const findFirstFile = (nodes: FileNode[]): FileNode | null => {
+    for (const node of nodes) {
+      if (node.type === 'file') {
+        return node;
       }
-    } catch (error) {
-      console.error('Error refreshing file structure:', error);
+      if (node.children) {
+        const found = findFirstFile(node.children);
+        if (found) return found;
+      }
     }
+    return null;
   };
 
   const handleFileSelect = (file: FileNode) => {
@@ -418,7 +448,7 @@ export default App;`,
             
             {/* Preview */}
             <div className="h-1/2">
-              <PreviewPanel />
+              <PreviewPanel websiteGenerated={websiteGenerated} />
             </div>
           </div>
         )}

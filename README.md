@@ -1,147 +1,175 @@
-# Programming Typing Speed Tester - Developer Workspace
+# AI Website Builder with RAG - Bolt.new Clone
 
-A modern developer workspace inspired by Bolt.new, featuring a comprehensive typing speed tester optimized for developers.
+A modern AI-powered website builder that creates complete websites from natural language prompts, enhanced with RAG (Retrieval-Augmented Generation) capabilities for document-based assistance.
 
 ## 🚀 Features
 
-### Modern Developer Workspace UI
-- **Dark Theme**: Optimized for developers with syntax highlighting
-- **Two-Panel Layout**: Left panel for workflow steps, right panel for code editor
-- **File Explorer**: Collapsible file tree with project structure
-- **Code Editor**: Monaco Editor with syntax highlighting for multiple languages
-- **Terminal Integration**: Real-time terminal with command execution
-- **Preview Mode**: Toggle between code and preview views
+### AI Website Generation
+- **Natural Language Prompts**: Describe your website idea and watch AI create it instantly
+- **Complete File Generation**: Creates all necessary files (HTML, CSS, JavaScript, React components)
+- **Modern Tech Stack**: Uses React, TypeScript, and Tailwind CSS
+- **Live Preview**: See your generated website immediately in the preview panel
+- **File Explorer**: Browse and edit generated files with syntax highlighting
 
-### Typing Speed Tester
-- **Multiple Practice Modes**: Symbols, keywords, code snippets, and mixed content
-- **Real-time Feedback**: Visual error highlighting and progress tracking
-- **Comprehensive Statistics**: WPM, accuracy, time elapsed, and status
-- **Programming-Focused**: Content specifically designed for developers
+### RAG Document Assistant
+- **Document Upload**: Upload PDF, DOCX, TXT, and MD files
+- **Intelligent Q&A**: Ask questions about your uploaded documents
+- **Vector Search**: Powered by ChromaDB for semantic document search
+- **Source Citations**: Get answers with source references
 
-### Chat-Assisted Development
-- **Command Palette**: Chat input styled like a command palette
-- **Slash Commands**: Support for `/new`, `/deploy`, `/run` commands
-- **AI Integration**: Contextual assistance for development workflow
-- **Keyboard Shortcuts**: Press `/` to open command palette
-
-### Developer Experience (DX)
-- **Workflow Steps**: Visual progress tracking with checkmarks
-- **File Management**: Open multiple files with tabbed interface
-- **Terminal Logs**: Real-time command output and logs
-- **Hot Reloading**: Live preview of application changes
+### Developer Experience
+- **Monaco Editor**: VS Code-like editing experience
+- **File Management**: Create, edit, and organize project files
+- **Terminal Integration**: Built-in terminal for running commands
+- **Responsive Design**: Works on desktop, tablet, and mobile devices
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: React 18 + TypeScript
-- **UI Framework**: Tailwind CSS
-- **Code Editor**: Monaco Editor (VS Code's editor)
-- **Icons**: Lucide React
-- **Build Tool**: Vite
-- **Package Manager**: npm
+### Frontend
+- **React 18** with TypeScript
+- **Tailwind CSS** for styling
+- **Monaco Editor** for code editing
+- **Lucide React** for icons
+- **Vite** for build tooling
+
+### Backend
+- **FastAPI** (Python)
+- **ChromaDB** for vector storage
+- **Groq API** for AI text generation
+- **Sentence Transformers** for embeddings
 
 ## 📦 Installation
 
-1. Clone the repository:
+1. **Clone the repository:**
 ```bash
 git clone <repository-url>
-cd programming-typing-tester
+cd ai-website-builder
 ```
 
-2. Install dependencies:
+2. **Install frontend dependencies:**
 ```bash
 npm install
 ```
 
-3. Start the development server:
+3. **Set up the backend:**
 ```bash
-npm run dev
+cd backend
+pip install -r requirements.txt
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+4. **Configure environment variables:**
+```bash
+cp backend/.env.example backend/.env
+# Edit backend/.env with your API keys
+```
+
+5. **Start the development servers:**
+```bash
+# Start both frontend and backend
+npm run dev
+
+# Or start them separately:
+npm run dev:frontend  # Frontend only
+npm run dev:backend   # Backend only
+```
 
 ## 🎯 Usage
 
-### Workspace Navigation
-- **Left Panel**: View workflow steps and project description
-- **File Explorer**: Navigate project files and folders
-- **Code Editor**: Edit files with syntax highlighting
-- **Terminal**: Execute commands and view logs
-- **Command Palette**: Press `/` or click the chat input
+### Website Generation
+1. Open the application and go to the "Chat" tab
+2. Type a prompt describing your website (e.g., "Create a modern landing page for a tech startup")
+3. Watch as AI generates all the necessary files
+4. View your website in the preview panel
+5. Edit files using the built-in code editor
 
-### Typing Test
-1. Select a practice mode (Symbols, Keywords, Snippets, Mixed)
-2. Start typing in the input field
-3. View real-time feedback and statistics
-4. Complete the test to see your results
+### Document Q&A (Admin Only)
+1. Click "Admin Login" and use the demo credentials
+2. Go to the "Upload" tab and upload your documents
+3. Switch to "Documents" to manage your uploaded files
+4. Use the chat interface to ask questions about your documents
 
-### Development Commands
-- `/new file` - Create a new file
-- `/deploy` - Deploy your application
-- `/run` - Start the development server
-- Ask questions about your code or project setup
+## 🔧 Configuration
 
-## 🎨 UI Components
+### Environment Variables
 
-### WorkflowPanel
-Displays development steps with progress indicators and project description.
+**Backend (.env):**
+```env
+GROQ_API_KEY=your_groq_api_key_here
+CHROMA_DB_PATH=./chroma_db
+UPLOAD_DIR=./uploads
+```
 
-### FileExplorer
-Collapsible file tree with file selection and tab management.
+**Frontend:**
+```env
+VITE_API_BASE_URL=http://localhost:8000
+```
 
-### CodeEditor
-Monaco Editor integration with syntax highlighting and multiple file tabs.
+### Demo Credentials
+- **Email**: admin@example.com
+- **Password**: admin123
 
-### TerminalPanel
-Terminal interface with command execution and real-time logs.
+## 🏗️ Project Structure
 
-### CommandPalette
-Chat interface with slash commands and AI assistance.
-
-### TypingTest
-Main typing test component with multiple practice modes.
-
-### TextDisplay
-Visual text display with error highlighting and cursor position.
-
-### StatsDisplay
-Statistics dashboard showing WPM, accuracy, time, and status.
-
-## 🔧 Development
-
-### Project Structure
 ```
 src/
 ├── components/
-│   ├── DeveloperWorkspace.tsx    # Main workspace component
-│   ├── WorkflowPanel.tsx         # Workflow steps panel
-│   ├── FileExplorer.tsx          # File tree explorer
-│   ├── CodeEditor.tsx            # Monaco editor integration
-│   ├── TerminalPanel.tsx         # Terminal interface
-│   ├── CommandPalette.tsx        # Chat command palette
-│   ├── TypingTest.tsx            # Main typing test
-│   ├── TextDisplay.tsx           # Text display component
-│   └── StatsDisplay.tsx          # Statistics display
-├── utils/
-│   ├── cn.ts                     # Class name utility
-│   └── textGenerator.ts          # Text generation utilities
-└── App.tsx                       # Main app component
+│   ├── IDE/
+│   │   ├── BoltIDE.tsx          # Main IDE interface
+│   │   ├── ChatPanel.tsx        # AI chat interface
+│   │   ├── CodeEditor.tsx       # File editor
+│   │   ├── FileExplorer.tsx     # File tree
+│   │   ├── PreviewPanel.tsx     # Website preview
+│   │   └── Terminal.tsx         # Terminal interface
+│   ├── RAGApp.tsx               # Main application
+│   ├── FileUpload.tsx           # Document upload
+│   ├── DocumentList.tsx         # Document management
+│   └── AuthModal.tsx            # Authentication
+├── hooks/
+│   └── useAuth.ts               # Authentication logic
+├── config/
+│   └── api.ts                   # API configuration
+└── types/
+    └── auth.ts                  # Type definitions
+
+backend/
+├── services/
+│   ├── groq_service.py          # AI text generation
+│   ├── embedding_service.py     # Text embeddings
+│   └── document_processor.py    # Document processing
+├── database/
+│   └── chroma_client.py         # Vector database
+└── models/
+    └── schemas.py               # Data models
 ```
 
-### Adding New Features
-1. Create new components in `src/components/`
-2. Update the workspace layout in `DeveloperWorkspace.tsx`
-3. Add new file types to the file tree
-4. Extend the command palette with new slash commands
+## 🎨 Example Prompts
 
-## 🎯 Future Enhancements
+Try these prompts to generate different types of websites:
 
-- [ ] GitHub integration for version control
-- [ ] Real file system integration
-- [ ] Advanced code analysis and suggestions
-- [ ] Custom themes and color schemes
-- [ ] Collaborative editing features
-- [ ] Performance analytics and insights
-- [ ] Integration with external development tools
+- "Create a modern landing page for a tech startup"
+- "Build a restaurant website with menu and online ordering"
+- "Make a portfolio website for a designer"
+- "Create a blog website with dark theme"
+- "Build a real estate website with property listings"
+- "Make a fitness app landing page"
+- "Create a SaaS product website"
+- "Build a photography portfolio site"
+
+## 🔄 Workflow
+
+1. **Prompt Input**: User describes the desired website
+2. **AI Processing**: Groq API generates website structure and code
+3. **File Creation**: Backend creates all necessary files
+4. **File Display**: Frontend updates file explorer with new files
+5. **Preview**: User can immediately see the generated website
+6. **Editing**: User can modify files using the built-in editor
+
+## 🚀 Deployment
+
+The application can be deployed to any platform that supports Node.js and Python:
+
+- **Frontend**: Vercel, Netlify, or any static hosting
+- **Backend**: Railway, Render, or any Python hosting service
 
 ## 📄 License
 
@@ -150,3 +178,18 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 🐛 Known Issues
+
+- File content is currently mocked in the frontend
+- Preview requires a running development server
+- Authentication is demo-only (not production-ready)
+
+## 🔮 Future Enhancements
+
+- [ ] Real file system integration
+- [ ] GitHub integration for version control
+- [ ] Custom themes and templates
+- [ ] Collaborative editing
+- [ ] Deployment integration
+- [ ] Advanced code analysis

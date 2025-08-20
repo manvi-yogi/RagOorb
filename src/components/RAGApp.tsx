@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, MessageSquare, Search, FileText, Trash2, Plus, Send, Loader2, LogOut, Shield, Code } from 'lucide-react';
+import { Upload, MessageSquare, FileText, Trash2, Plus, LogOut, Shield } from 'lucide-react';
 import { FileUpload } from './FileUpload';
-import { ChatInterface } from './ChatInterface';
 import { DocumentList } from './DocumentList';
 import { AuthModal } from './AuthModal';
 import { BoltIDE } from './IDE/BoltIDE';
@@ -17,21 +16,10 @@ interface Document {
   chunks_count: number;
 }
 
-interface Message {
-  id: string;
-  type: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  sources?: string[];
-}
-
 export const RAGApp: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'chat' | 'documents' | 'upload' | 'ide'>('upload');
+  const [activeTab, setActiveTab] = useState<'chat' | 'documents' | 'upload'>('chat');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [documents, setDocuments] = useState<Document[]>([]);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [query, setQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const { user, isAdmin, logout } = useAuth();
 
@@ -91,61 +79,6 @@ export const RAGApp: React.FC = () => {
     }
   };
 
-  const handleQuery = async (queryText: string) => {
-    if (!queryText.trim() || isLoading) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: queryText,
-      timestamp: new Date(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setQuery('');
-    setIsLoading(true);
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/query`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: queryText,
-          max_results: 5,
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          type: 'assistant',
-          content: result.answer,
-          timestamp: new Date(),
-          sources: result.sources,
-        };
-
-        setMessages(prev => [...prev, assistantMessage]);
-      } else {
-        const error = await response.json();
-        throw new Error(error.detail || 'Query failed');
-      }
-    } catch (error) {
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'assistant',
-        content: 'Sorry, I encountered an error processing your question. Please try again.',
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleDeleteDocument = async (documentId: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/documents/${documentId}`, {
@@ -161,11 +94,6 @@ export const RAGApp: React.FC = () => {
     } catch (error) {
       console.error('Error deleting document:', error);
     }
-  };
-
-  const handleSubmitQuery = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleQuery(query);
   };
 
   return (
@@ -231,7 +159,6 @@ export const RAGApp: React.FC = () => {
               ...(isAdmin ? [
                 { id: 'upload', label: 'Upload', icon: Upload },
                 { id: 'documents', label: 'Documents', icon: FileText },
-                { id: 'ide', label: 'IDE', icon: Code },
               ] : []),
               { id: 'chat', label: 'Chat', icon: MessageSquare },
             ].map(({ id, label, icon: Icon }) => (
@@ -289,15 +216,9 @@ export const RAGApp: React.FC = () => {
           </div>
         )}
 
-        {activeTab === 'ide' && isAdmin && (
-          <div className="fixed inset-0 top-32 bg-white">
-            <BoltIDE />
-          </div>
-        )}
-
         {activeTab === 'chat' && (
           <div className="fixed inset-0 top-32 bg-white">
-            <BoltIDE />
+            <BoltIDE documents={documents} />
           </div>
         )}
       </main>
